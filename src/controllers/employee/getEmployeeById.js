@@ -8,7 +8,7 @@ const querySchema = z.object({
         const parsedYear = Number.parseInt(value, 10);
         if (isNaN(parsedYear)) return false;  
         return parsedYear >= 2018 && parsedYear <= new Date().getFullYear();  
-    }).optional()
+    })
 })
 
 
