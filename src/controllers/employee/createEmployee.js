@@ -105,7 +105,7 @@ export const createEmployee = async(req, res)=>{
         console.error("POST EMPLOYEE API ERROR", error);
         return res.status(500).json({
             success: false,
-            message: 'Internal server error',
+            message: `Internal Server Error. ${error?.message}`,
             data : {}
         });
     }

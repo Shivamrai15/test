@@ -3,12 +3,7 @@ import { db } from "../../db.js";
 export const getEmployees = async(req, res) => {
     try {
         
-        const employees = await db.employee.findMany({
-            include : {
-                address : true
-            },
-        });
-
+        const employees = await db.employee.findMany();
         return res.status(200).json({
             success: true,
             message: "Employees found successfully",
@@ -19,7 +14,7 @@ export const getEmployees = async(req, res) => {
         console.error("GET ALL EMPLOYEES API ERROR: ", error);
         return res.status(500).json({
             success: false, 
-            message: "Internal Server Error",
+            message: `Internal Server Error. ${error?.message}`,
             data : {}
         });
     }

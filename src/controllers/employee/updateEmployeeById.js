@@ -32,8 +32,6 @@ export const updateEmployeeById = async (req, res) => {
         }
 
         const data = validatedData.data;
-        const existingKids = data.kids.filter((kid)=>kid.id!==undefined);
-        const newKids = data.kids.filter((kid)=>kid.id===undefined);
 
         const updatedEmployee = await db.employee.update({
             where: {
@@ -43,12 +41,20 @@ export const updateEmployeeById = async (req, res) => {
                 ...data,
                 dob : new Date(data.dob),
                 joiningDate : new Date(data.joiningDate),
-                anniversaryDate : data.anniversaryDate ? new Date(data.anniversaryDate) : null,
+                anniversaryDate : data.anniversaryDate ? new Date(data.anniversaryDate) : undefined,
                 spouse : data.spouse? {
                     upsert : {
-                        ...data.spouse,
-                        dob : new Date(data.spouse.dob),
-                        updatedBy : "Maninder Singh"
+                        create : {
+                            ...data.spouse,
+                            dob : new Date(data.spouse.dob),
+                            updatedBy : "Maninder Singh",
+                            createdBy : "Maninder Singh",
+                        },
+                        update : {
+                            ...data.spouse,
+                            dob : new Date(data.spouse.dob),
+                            updatedBy : "Maninder Singh",
+                        }
                     }
                 } : undefined,
                 address : {
@@ -57,52 +63,76 @@ export const updateEmployeeById = async (req, res) => {
                         updatedBy : "Maninder Singh"
                     }
                 },
-                paymentEvents : {
-                    updateMany : [
-                        {
-                            where : {
-                                employeeId : employee.id,
-                                paymentType : "BIRTHDAY",
-                            },
-                            data : {
-                                eventDate : new Date(data.dob),
-                                reminderDate : new Date(new Date(data.dob)-3),
-                                updatedBy : "Maninder Singh"
-                            }
-                        },
-                        data.anniversaryDate ? {
-                            where : {
-                                employeeId : employee.id,
-                                paymentType : "ANNIVERSARY",
-                            },
-                            data : {
-                                eventDate : new Date(data.anniversaryDate),
-                                reminderDate : new Date(new Date(data.anniversaryDate)-3),
-                                updatedBy : "Maninder Singh"
-                            }
-                        } : undefined,
-                    ]
-                },
                 kids : {
-                    updateMany : existingKids.map(kid=>({
-                        where : {
-                            id : kid.id
-                        },
-                        data : {
+                    deleteMany : [
+                        {
+                            employeeId : employee.id,
+                        }
+                    ],
+                    createMany : {
+                        data : data.kids.map(kid=>({
                             ...kid,
                             dob : new Date(kid.dob),
-                            updatedBy : "Maninder Singh"
-                        }
-                    })),
-                    createMany : newKids.map(kid=>({
-                        ...kid,
-                        dob : new Date(kid.dob),
-                        createdBy : "Maninder Singh",
-                        updatedBy : "Maninder Singh"
-                    }))
+                            updatedBy : "Maninder Singh",
+                            createdBy : "Maninder Singh",
+                        }))
+                    }
                 },
             }
         });
+
+        if (!updatedEmployee) {
+            return res.status(500).json({
+                success: false,
+                message: 'Employee not updated',
+                data : {}
+            });
+        }
+
+        const paymentEvents = await db.paymentEvent.findMany({
+            where : {
+                AND : [
+                    {employeeId : employee.id},
+                    {paymentType : {
+                        in : ["ANNIVERSARY", "BIRTHDAY"]
+                    }}
+                ]
+            },
+            select : {
+                id : true,
+                paymentType : true,
+                eventDate : true,
+                reminderDate : true
+            }
+        });
+
+        if ( paymentEvents.length > 0 ) {
+            const paymentEventsData = paymentEvents.map(event=>{
+                const date = event.paymentType==="BIRTHDAY" ? new Date(data.dob) : new Date(data.anniversaryDate);
+                const eventDate = new Date(date.setFullYear(new Date().getFullYear()));
+                const reminderDate = new Date(eventDate-3);
+
+                return {
+                    ...event,
+                    eventDate,  
+                    reminderDate,
+                    updatedBy : "Maninder Singh"
+                }
+            });
+
+            await Promise.all(
+                paymentEventsData.map((event) =>
+                    db.paymentEvent.update({
+                        where: { id: event.id },
+                        data: {
+                            eventDate: event.eventDate,
+                            reminderDate: event.reminderDate,
+                            updatedBy: event.updatedBy,
+                        },
+                    })
+                )
+            );
+        }
 
         return res.status(200).json({
             success: true,
@@ -114,7 +144,7 @@ export const updateEmployeeById = async (req, res) => {
         console.error("UPDATE EMPLOYEE BY ID API ERROR: ", error);
         return res.status(500).json({
             success: false,
-            message: "Internal Server Error",
+            message: `Internal Server Error. ${error?.message}`,
             data : {}
         });
     }

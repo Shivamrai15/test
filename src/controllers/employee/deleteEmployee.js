@@ -76,7 +76,7 @@ export const deleteEmployee = async (req, res) => {
         console.error("DELETE EMPLOYEE API ERROR: ", error);
         return res.status(500).json({
             success: false, 
-            message: "Internal Server Error",
+            message: `Internal Server Error. ${error?.message}`,
             data : {}
         });
     }
