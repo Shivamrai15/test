@@ -14,7 +14,20 @@ export const getUpcomingEventController = async (req, res) => {
     }
     const { page, limit, order } = parsedQuery.data;
 
-    const totalEvents = await db.paymentEvent.count();
+    const today = new Date();
+    const twoDaysBack = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2);
+    const yearEndDate = new Date(today.getFullYear(), 11, 31);
+
+    const totalEvents = await db.paymentEvent.count({
+      where: {
+        isActive: true,
+        eventDate: {
+          gte: twoDaysBack,
+          lte: yearEndDate
+        }
+      },
+    });
+
     if (totalEvents === 0) {
       return res.status(404).json({
         success: false,
@@ -22,9 +35,7 @@ export const getUpcomingEventController = async (req, res) => {
         data: []
       });
     }
-    const today = new Date();
-    const twoDaysBack = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2);
-    const yearEndDate = new Date(today.getFullYear(), 11, 31);
+    
     const upcomingEvents = await db.paymentEvent.findMany({
       where: {
         isActive: true,
