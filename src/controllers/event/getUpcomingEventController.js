@@ -47,7 +47,7 @@ export const getUpcomingEventController = async (req, res) => {
           }
         }
       },
-      skip: (page - 1) * limitNumber,
+      skip: (page - 1) * limit,
       take: limit
     });
     if (upcomingEvents.length === 0) {
