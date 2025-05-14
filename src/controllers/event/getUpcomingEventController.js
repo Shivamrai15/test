@@ -1,15 +1,25 @@
 import { db } from '../../db.js';
+import { QuerySchema } from '../../schemas/query.schema.js';
 
 export const getUpcomingEventController = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const pageNumber = parseInt(page);
-    const limitNumber = parseInt(limit);
-    if (pageNumber < 1 || limitNumber < 1) {
+    const query = req.query;
+    const parsedQuery = await QuerySchema.safeParseAsync(query);
+    if (!parsedQuery.success) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid pagination parameters',
-        data: {}
+        message: 'Invalid query parameters',
+        data: parsedQuery.error.errors
+      });
+    }
+    const { page, limit, order } = parsedQuery.data;
+
+    const totalEvents = await db.paymentEvent.count();
+    if (totalEvents === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No events found',
+        data: []
       });
     }
     const today = new Date();
@@ -24,7 +34,7 @@ export const getUpcomingEventController = async (req, res) => {
         }
       },
       orderBy: {
-        eventDate: 'desc'
+        eventDate: order
       },
       include: {
         employee: {
@@ -37,8 +47,8 @@ export const getUpcomingEventController = async (req, res) => {
           }
         }
       },
-      skip: (pageNumber - 1) * limitNumber,
-      take: limitNumber
+      skip: (page - 1) * limitNumber,
+      take: limit
     });
     if (upcomingEvents.length === 0) {
       return res.status(404).json({
@@ -50,7 +60,12 @@ export const getUpcomingEventController = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Events fetched successfully',
-      data: upcomingEvents
+      data: {
+        upcomingEvents,
+        totalEvents,
+        page,
+        limit
+      }
     });
   } catch (error) {
     return res.status(500).json({
