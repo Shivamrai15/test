@@ -3,6 +3,6 @@ import { confirmPaymentController, getPaymentTypeController, updatePaymentContro
 
 export const paymentRouter = Router();
 
-paymentRouter.patch('/', updatePaymentController);
+paymentRouter.patch('/:id', updatePaymentController);
 paymentRouter.get('/types', getPaymentTypeController);
 paymentRouter.get('/confirmPayment', confirmPaymentController);
