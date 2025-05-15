@@ -37,7 +37,7 @@ export const updateEmployeeById = async (req, res) => {
       },
       data: {
         ...data,
-        dob: new Date(data.dob),
+        dateOfBirth: new Date(data.dateOfBirth),
         joiningDate: new Date(data.joiningDate),
         anniversaryDate: data.anniversaryDate ? new Date(data.anniversaryDate) : undefined,
         spouse: data.spouse
@@ -45,13 +45,13 @@ export const updateEmployeeById = async (req, res) => {
               upsert: {
                 create: {
                   ...data.spouse,
-                  dob: new Date(data.spouse.dob),
+                  dateOfBirth: new Date(data.spouse.dateOfBirth),
                   updatedBy: 'Maninder Singh',
                   createdBy: 'Maninder Singh'
                 },
                 update: {
                   ...data.spouse,
-                  dob: new Date(data.spouse.dob),
+                  dateOfBirth: new Date(data.spouse.dateOfBirth),
                   updatedBy: 'Maninder Singh'
                 }
               }
@@ -72,7 +72,7 @@ export const updateEmployeeById = async (req, res) => {
           createMany: {
             data: data.kids.map((kid) => ({
               ...kid,
-              dob: new Date(kid.dob),
+              dateOfBirth: new Date(kid.dateOfBirth),
               updatedBy: 'Maninder Singh',
               createdBy: 'Maninder Singh'
             }))
@@ -110,7 +110,7 @@ export const updateEmployeeById = async (req, res) => {
 
     if (paymentEvents.length > 0) {
       const paymentEventsData = paymentEvents.map((event) => {
-        const date = event.paymentType === 'BIRTHDAY' ? new Date(data.dob) : new Date(data.anniversaryDate);
+        const date = event.paymentType === 'BIRTHDAY' ? new Date(data.dateOfBirth) : new Date(data.anniversaryDate);
         const eventDate = new Date(date.setFullYear(new Date().getFullYear()));
         const reminderDate = new Date(eventDate - 3);
 

@@ -28,10 +28,14 @@ export const createEmployee = async (req, res) => {
       });
     }
 
+    const existingEmployeesCount = await db.employee.count();
+    const employeeId = 1001 + existingEmployeesCount;
+
     const employee = await db.employee.create({
       data: {
         ...data,
-        dob: new Date(data.dob),
+        employeeId,
+        dateOfBirth: new Date(data.dateOfBirth),
         joiningDate: new Date(data.joiningDate),
         anniversaryDate: data.anniversaryDate ? new Date(data.anniversaryDate) : null,
         address: {
@@ -45,7 +49,7 @@ export const createEmployee = async (req, res) => {
           ? {
               create: {
                 ...data.spouse,
-                dob: new Date(data.spouse.dob),
+                dateOfBirth: new Date(data.spouse.dateOfBirth),
                 createdBy: 'Maninder Singh',
                 updatedBy: 'Maninder Singh'
               }
@@ -54,7 +58,7 @@ export const createEmployee = async (req, res) => {
         kids: {
           create: data.kids.map((kid) => ({
             ...kid,
-            dob: new Date(kid.dob),
+            dateOfBirth: new Date(kid.dateOfBirth),
             createdBy: 'Maninder Singh',
             updatedBy: 'Maninder Singh'
           }))

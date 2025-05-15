@@ -23,12 +23,12 @@ model User {
 
 model Employee {
   id              String         @id @default(auto()) @map("_id") @db.ObjectId
-  employeeId      String         @unique
+  employeeId      Int         @unique
   name            String
   email           String         @unique
   baseSalary      Int
   variablePay     Int
-  dob             DateTime
+  dateOfBirth     DateTime
   joiningDate     DateTime
   paymentEvents   PaymentEvent[]
   address         Address?
@@ -43,34 +43,31 @@ model Employee {
   updatedAt DateTime @updatedAt
 }
 
-
 model Spouse {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  name       String
-  dob        DateTime
-  employeeId String @db.ObjectId @unique
-  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  dateOfBirth DateTime
+  employeeId  String   @unique @db.ObjectId
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
   createdBy String
   updatedBy String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
 
 model Kid {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  name       String
-  dob        DateTime
-  employeeId String @db.ObjectId
-  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  dateOfBirth DateTime
+  employeeId  String   @db.ObjectId
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
   createdBy String
   updatedBy String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
 
 enum PAYMENTTYPE {
   SALARY

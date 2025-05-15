@@ -2,10 +2,9 @@ import * as z from 'zod';
 import { DateSchema } from './date.schema.js';
 
 export const EmployeeSchema = z.object({
-  employeeId: z.string().min(3).max(10),
   name: z.string().min(1).max(50),
   email: z.string().email(),
-  dob: DateSchema,
+  dateOfBirth: DateSchema,
   joiningDate: DateSchema,
   baseSalary: z.number().min(0),
   variablePay: z.number().min(0),
@@ -29,22 +28,21 @@ export const EmployeeSchema = z.object({
   spouse: z
     .object({
       name: z.string().min(1).max(50),
-      dob: DateSchema
+      dateOfBirth: DateSchema
     })
     .optional(),
   kids: z.array(
     z.object({
       name: z.string().min(1).max(50),
-      dob: DateSchema
+      dateOfBirth: DateSchema
     })
   )
 });
 
 export const UpdateEmployeeSchema = z.object({
-  employeeId: z.string().min(3).max(10),
   name: z.string().min(1).max(50),
   email: z.string().email(),
-  dob: DateSchema,
+  dateOfBirth: DateSchema,
   joiningDate: DateSchema,
   baseSalary: z.number().min(0),
   variablePay: z.number().min(0),
@@ -59,14 +57,14 @@ export const UpdateEmployeeSchema = z.object({
   spouse: z
     .object({
       name: z.string().min(1).max(50),
-      dob: DateSchema
+      dateOfBirth: DateSchema
     })
     .optional(),
   kids: z.array(
     z.object({
       id: z.string().min(24).max(24).optional(),
       name: z.string().min(1).max(50),
-      dob: DateSchema
+      dateOfBirth: DateSchema
     })
   )
 });

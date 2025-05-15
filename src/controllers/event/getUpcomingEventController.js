@@ -25,7 +25,7 @@ export const getUpcomingEventController = async (req, res) => {
           gte: twoDaysBack,
           lte: yearEndDate
         }
-      },
+      }
     });
 
     if (totalEvents === 0) {
@@ -35,7 +35,7 @@ export const getUpcomingEventController = async (req, res) => {
         data: []
       });
     }
-    
+
     const upcomingEvents = await db.paymentEvent.findMany({
       where: {
         isActive: true,
