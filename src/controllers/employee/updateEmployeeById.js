@@ -69,21 +69,20 @@ export const updateEmployeeById = async (req, res) => {
               employeeId: employee.id
             }
           ],
-          createMany: data.kids.length > 0
-            ? {
-                data: data.kids.map((kid) => ({
-                  ...kid,
-                  dateOfBirth: new Date(kid.dateOfBirth),
-                  updatedBy: 'Maninder Singh',
-                  createdBy: 'Maninder Singh'
-                }))
-              }
-            : undefined
+          createMany:
+            data.kids.length > 0
+              ? {
+                  data: data.kids.map((kid) => ({
+                    ...kid,
+                    dateOfBirth: new Date(kid.dateOfBirth),
+                    updatedBy: 'Maninder Singh',
+                    createdBy: 'Maninder Singh'
+                  }))
+                }
+              : undefined
         }
       }
     });
-
-    
 
     if (!updatedEmployee) {
       return res.status(500).json({
