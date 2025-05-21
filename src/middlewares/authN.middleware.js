@@ -3,9 +3,9 @@ import { verifyToken } from "@clerk/express";
 export async function authNMiddleware(req, res, next) {
   try {
 
-    const session = req.cookies.__session;
+    const sessionToken = req.headers.authorization?.split(' ')[1];
 
-    if (!session) {
+    if (!sessionToken) {
       return res.status(401).json({
         success: false,
         message: 'Unauthorized',
@@ -13,7 +13,7 @@ export async function authNMiddleware(req, res, next) {
       });
     }
 
-    const isTokenValid = await verifyToken(session, {
+    const isTokenValid = await verifyToken(sessionToken, {
       secretKey : process.env.CLERK_SECRET_KEY,
     });
 
@@ -24,7 +24,7 @@ export async function authNMiddleware(req, res, next) {
         data: {}
       });
     }
-    
+
     next();
     
   } catch (error) {

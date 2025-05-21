@@ -1,10 +1,22 @@
-import { getAuth } from '@clerk/express';
+import jwt from "jsonwebtoken";
 import { db } from '../db.js';
 
 export async function authZMiddleware(req, res, next) {
   try {
-    const clerkUser = getAuth(req);
-    if (!clerkUser.sessionClaims.email) {
+
+    const sessionToken = req.headers.authorization?.split(' ')[1];
+
+    if (!sessionToken) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized',
+        data: {}
+      });
+    }
+
+    const clerkUser = jwt.decode(sessionToken);
+
+    if (!clerkUser.email) {
       return res.status(401).json({
         success: false,
         message: 'Unauthorized',
@@ -14,7 +26,7 @@ export async function authZMiddleware(req, res, next) {
 
     const user = await db.user.findUnique({
       where: {
-        email: clerkUser.sessionClaims.email
+        email: clerkUser.email
       }
     });
 
@@ -33,7 +45,9 @@ export async function authZMiddleware(req, res, next) {
         data: {}
       });
     }
+
     next();
+
   } catch (error) {
     return res.status(500).json({
       success: false,
