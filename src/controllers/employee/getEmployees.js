@@ -14,7 +14,12 @@ export const getEmployees = async (req, res) => {
     }
     const { page, limit, order } = parsedQuery.data;
 
-    const totalEmployees = await db.employee.count();
+    const totalEmployees = await db.employee.count({
+      where : {
+        isActive : true
+      }
+    });
+    
     if (totalEmployees === 0) {
       return res.status(404).json({
         success: false,
@@ -24,12 +29,16 @@ export const getEmployees = async (req, res) => {
     }
 
     const employees = await db.employee.findMany({
+      where : {
+        isActive : true
+      },
       take: limit,
       skip: (page - 1) * limit,
       orderBy: {
         name: order
       }
     });
+
     return res.status(200).json({
       success: true,
       message: 'Employees found successfully',
