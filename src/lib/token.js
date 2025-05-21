@@ -10,7 +10,6 @@ export const generateToken = ({ eventId, employeeId, employeeEmail }) => {
     process.env.JWT_SECRET,
     {
       expiresIn: '2d',
-      algorithm: 'RS256',
       issuer: process.env.JWT_ISSUER
     }
   );
@@ -21,7 +20,6 @@ export const verifyToken = (token) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET, {
       issuer: process.env.JWT_ISSUER,
-      algorithms: ['RS256']
     });
 
     if (!decoded) {
