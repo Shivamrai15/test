@@ -22,9 +22,9 @@ app.use(
 app.use(cookieParser());
 app.use(clerkMiddleware());
 
-app.use('/api/v1/employee/', authNMiddleware, authZMiddleware, employeeRouter);
-app.use('/api/v1/event/', authNMiddleware, authZMiddleware, eventRouter);
-app.use('/api/v1/payment/',authNMiddleware, authZMiddleware, paymentRouter);
+app.use('/api/v1/employee/', employeeRouter);
+app.use('/api/v1/event/', eventRouter);
+app.use('/api/v1/payment/', paymentRouter);
 
 app.get('/',authNMiddleware, authZMiddleware, (req, res) => {
   return res.send('Insure Infinite API');
